@@ -43,6 +43,18 @@ Resolve-Path $nugetChocolateyPath\functions\*.ps1 |
     ? { -not ($_.ProviderPath.Contains(".Tests.")) } |
     % { . $_.ProviderPath }
 
+# configuration
+Import-Module "$nugetChocolateyPath\modules\poweryaml\PowerYaml.psm1"
+$globalConfig = Get-Yaml -FromFile (Resolve-Path $nugetChocolateyPath\.chocolateyconfig)
+#$env:USERPROFILE or $env:HOME
+$userConfigFile = Join-Path $env:USERPROFILE .chocolateyconfig
+$userConfig = $globalConfig
+if (Test-Path($userConfigFile)) {
+  $userConfig = Get-Yaml -FromFile (Resolve-Path $userConfigFile)
+}
+
+$userConfig.useNuGetForSources.GetType()
+
 #main entry point
 Remove-LastInstallLog
 
