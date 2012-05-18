@@ -34,6 +34,8 @@ $chocInstallVariableName = "ChocolateyInstall"
 $nugetExe = Join-Path $nugetChocolateyPath 'nuget.exe'
 $h1 = '====================================================='
 $h2 = '-------------------------'
+$globalConfig = ''
+$userConfig = ''
 
 $DebugPreference = "SilentlyContinue"
 if ($debug) {$DebugPreference = "Continue";}
@@ -45,15 +47,8 @@ Resolve-Path $nugetChocolateyPath\functions\*.ps1 |
 
 # configuration
 Import-Module "$nugetChocolateyPath\modules\poweryaml\PowerYaml.psm1"
-$globalConfig = Get-Yaml -FromFile (Resolve-Path $nugetChocolateyPath\.chocolateyconfig)
-#$env:USERPROFILE or $env:HOME
-$userConfigFile = Join-Path $env:USERPROFILE .chocolateyconfig
-$userConfig = $globalConfig
-if (Test-Path($userConfigFile)) {
-  $userConfig = Get-Yaml -FromFile (Resolve-Path $userConfigFile)
-}
 
-$userConfig.useNuGetForSources.GetType()
+Get-ConfigValue('useNuGetForSources')
 
 #main entry point
 Remove-LastInstallLog
