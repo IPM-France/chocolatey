@@ -1,5 +1,9 @@
-Chocolatey NuGet (like apt-get, but for Windows)
+Chocolatey NuGet
 =======
+------
+IPM France specific version for kiosks.
+------
+
 ![Chocolatey Logo](https://github.com/chocolatey/chocolatey/raw/master/docs/logo/chocolateyicon.gif "Chocolatey")  
   
 # LICENSE
