@@ -1,10 +1,13 @@
 Chocolatey NuGet
 =======
 ------
-IPM France specific version for kiosks.
+# *IPM France specific version for kiosks* #
+
+
+![Logo IPM France](https://github.com/IPM-France/Software-tools/raw/master/images/IPM_logo.png "Logo")
+
 ------
 
-![Chocolatey Logo](https://github.com/chocolatey/chocolatey/raw/master/docs/logo/chocolateyicon.gif "Chocolatey")  
   
 # LICENSE
 Apache 2.0 - see docs/legal (just LEGAL in the zip folder)
