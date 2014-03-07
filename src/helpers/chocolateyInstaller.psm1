@@ -31,3 +31,9 @@ Export-ModuleMember -Function `
 	Start-ChocolateyProcessAsAdmin,`
 	Uninstall-ChocolateyPackage,`
 	Update-SessionEnvironment
+	Uninstall-ChocolateyPath,`
+	Test-KioskConfiguration,`
+	Register-KioskSoftware,`
+	Unregister-KioskSoftware,`
+	Register-KioskHardware,`
+	Unregister-KioskHardware
