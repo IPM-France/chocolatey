@@ -78,17 +78,35 @@ Function Register-KioskSoftware
 		# Installing check handler
 		Write-Host "$($MyInvocation.MyCommand.Name):: installing check handler ..."
 		$fCheckInstalled = Join-Path -Path (Join-Path -Path $packageDir "content") "checkInstalled.cmd"
-		if (-not (Test-Path -path $fCheckInstalled)) { 
+		if (-not (Test-Path -path $fCheckInstalled))
+        { 
+		  $fCheckInstalled = Join-Path -Path (Join-Path -Path $packageDir "content") "checkInstalled.ps1"
+		  if (-not (Test-Path -path $fCheckInstalled))
+          {
 			$fCheckInstalled = '' 
+          }
 		}
+
 		$fCheckOk = Join-Path -Path (Join-Path -Path $packageDir "content") "checkOk.cmd"
-		if (-not (Test-Path -path $fCheckOk)) { 
+		if (-not (Test-Path -path $fCheckOk))
+        { 
+		  $fCheckOk = Join-Path -Path (Join-Path -Path $packageDir "content") "checkOk.ps1"
+		  if (-not (Test-Path -path $fCheckOk))
+          {
 			$fCheckOk = '' 
+          }
 		}
+
 		$fTestModule = Join-Path -Path (Join-Path -Path $packageDir "content") "testModule.cmd"
-		if (-not (Test-Path -path $fTestModule)) { 
+		if (-not (Test-Path -path $fTestModule))
+        { 
+		  $fTestModule = Join-Path -Path (Join-Path -Path $packageDir "content") "testModule.ps1"
+		  if (-not (Test-Path -path $fTestModule))
+          { 
 			$fTestModule = '' 
+          }
 		}
+        
 		$copyChecks = $false
 		if ($copyChecks) {
 			$fCheckInstalled2 = "checkInstalled_"+$packageName+".cmd"
