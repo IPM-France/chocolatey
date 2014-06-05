@@ -1,17 +1,17 @@
-Function Register-KioskSoftware 
+Function Register-Kiosk
 { 
     <# 
     .Synopsis 
-        Register a software installed on the kiosk
+        Register a package installed on the kiosk
          
     .Description 
-		Sets values in the registry for the software package
+		Sets values in the registry for the package
 		Updates nsclient registry configuration to install checkPackage.cmd scheduled execution for the required package
          
     .Notes 
         Author    : IPM France, Frédéric MOHIER 
         Date      : 8/1/2014 
-        Version   : 1.6
+        Version   : 1.0
          
         #Requires -Version 2.0 
          
@@ -20,6 +20,9 @@ Function Register-KioskSoftware
          
     .Outputs 
         System.Int 
+
+	.Parameter isHardwarePackage
+        Specifies if the package is hardware.
          
     .Parameter packageName
         Specifies the package name.
@@ -42,21 +45,18 @@ Function Register-KioskSoftware
     .Parameter parameters
         Extra parameters to store in package registry.
          
-    .Parameter nscaChecks
-        Switch to install NSCA scheduled check (-nsca)
-         
     #> 
      
     [CmdletBinding()] 
     Param( 
+        [Parameter(Mandatory=$True)] [string]$isHardwarePackage,
         [Parameter(Mandatory=$True)] [string]$packageName,
         [Parameter(Mandatory=$True)] [string]$packageVersion,
         [Parameter(Mandatory=$True)] [string]$packageDir,
         [Parameter(Mandatory=$True)] [string]$installDir,
         [Parameter(Mandatory=$True)] [string]$packageMainFile,
 		[int]$packageCheckPeriod = $global:ksk_checkPeriod,
-		[hashtable] $parameters,
-		[switch] $nscaChecks = $false
+		[hashtable] $parameters
     ) 
      
     Begin 
@@ -107,31 +107,19 @@ Function Register-KioskSoftware
           }
 		}
         
-		$copyChecks = $false
-		if ($copyChecks) {
-			$fCheckInstalled2 = "checkInstalled_"+$packageName+".cmd"
-			$fCheckInstalled2 = Join-Path $global:IPM_KSK_MON_CHECKS_DIR $fCheckInstalled2
-			Copy-Item -Path (Join-Path -Path (Join-Path -Path $packageDir "content") "checkInstalled.cmd") -Destination $fCheckInstalled2 -ErrorAction SilentlyContinue
-			$fCheckOk2 = "checkOk_"+$packageName+".cmd"
-			$fCheckOk2 = Join-Path $global:IPM_KSK_MON_CHECKS_DIR $fCheckOk2
-			Copy-Item -Path (Join-Path -Path (Join-Path -Path $packageDir "content")  "checkOk.cmd") -Destination $fCheckOk2 -ErrorAction SilentlyContinue
-		}
-
 		# NSClient Configuration
 		Write-Host "$($MyInvocation.MyCommand.Name):: installing check command ..."
 		$registryPath='HKLM:\SOFTWARE\NSClient++';
 		if (-not(Test-Path -path (Join-Path $registryPath "settings/external scripts/wrapped scripts"))) { New-Item (Join-Path $registryPath "settings/external scripts/wrapped scripts") -ItemType directory }
 		Set-ItemProperty -Path (Join-Path $registryPath "settings/external scripts/wrapped scripts") -Name "check_$packageName" -Value "ipm-Kiosks\checkPackage.ps1 status $packageName -ca `$ARG1`$" -Force
 		
-		# Declare True to install NSCA scheduled check ...
-		if ($nscaChecks) {
-			Write-Host "$($MyInvocation.MyCommand.Name):: installing NSCA scheduled check ..."
-			New-Item -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Force
-			Set-ItemProperty -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Name 'alias' -Value "nsca-$packageName" -Force
-			Set-ItemProperty -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Name 'command' -Value "check_$packageName" -Force
-			$value=%{'{0}s' -f $packageCheckPeriod}
-			Set-ItemProperty -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Name 'interval' -Value $value -Force
-		}
+		# Install NSCA scheduled check ...
+		Write-Host "$($MyInvocation.MyCommand.Name):: installing NSCA scheduled check ..."
+		New-Item -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Force
+		Set-ItemProperty -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Name 'alias' -Value "nsca-$packageName" -Force
+		Set-ItemProperty -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Name 'command' -Value "check_$packageName" -Force
+		$value=%{'{0}s' -f $packageCheckPeriod}
+		Set-ItemProperty -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Name 'interval' -Value $value -Force
 		
 		
 		# Starting monitoring agent service
@@ -140,15 +128,20 @@ Function Register-KioskSoftware
 		# Set-Service $serviceName -startuptype Automatic
 		# Start-Service $serviceName
 		
+		if ($isHardwarePackage) {
+            $packageType = $global:IPM_KSK_PKG_HARDWARE
+        } else {
+            $packageType = $global:IPM_KSK_PKG_SOFTWARE
+        }
 		
-		# Registering software installation (global values ...)
-		Set-ItemProperty -Path $global:IPM_KSK_PKG_SOFTWARE -Name "Package $packageName" -Value "$packageVersion"
+		# Registering package installation (global values ...)
+		Set-ItemProperty -Path $packageType -Name "Package $packageName" -Value "$packageVersion"
 		
-		# Registering software installation
-		$regKiosk = Join-Path $global:IPM_KSK_PKG_SOFTWARE $packageName
+		# Registering package installation
+		$regKiosk = Join-Path $packageType $packageName
 		
-		Write-Host "$($MyInvocation.MyCommand.Name):: setting software configuration in $IPM_KSK_PKG_SOFTWARE ..."
-		if (-not(Test-Path -path $global:IPM_KSK_PKG_SOFTWARE)) { New-Item $global:IPM_KSK_PKG_SOFTWARE -ItemType directory }
+		Write-Host "$($MyInvocation.MyCommand.Name):: setting package configuration in $packageType ..."
+		if (-not(Test-Path -path $packageType)) { New-Item $packageType -ItemType directory }
 		if (-not(Test-Path -path $regKiosk)) { New-Item $regKiosk -ItemType directory }
 		Set-ItemProperty -Path $regKiosk -Name "Package" -Value "$packageName"
 		Set-ItemProperty -Path $regKiosk -Name "Version" -Value "$packageVersion"
@@ -163,7 +156,7 @@ Function Register-KioskSoftware
 		Set-ItemProperty -Path $regKiosk -Name "Status" -Value 0 -Type DWord
 
 		if ($parameters) {
-			Write-Host "$($MyInvocation.MyCommand.Name):: setting extra parameters in $IPM_KSK_PKG_SOFTWARE\$packageName ..."
+			Write-Host "$($MyInvocation.MyCommand.Name):: setting extra parameters in $packageType\$packageName ..."
 			foreach($key in $($parameters.keys)){ 
 				Write-Host "$($MyInvocation.MyCommand.Name):: extra configuration parameter '$key' = " $parameters[$key]
 				$value = $parameters[$key]
