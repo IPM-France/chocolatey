@@ -49,7 +49,7 @@ Function Register-Kiosk
      
     [CmdletBinding()] 
     Param( 
-        [Parameter(Mandatory=$True)] [string]$isHardwarePackage,
+        [Parameter(Mandatory=$True)] [bool]$isHardwarePackage,
         [Parameter(Mandatory=$True)] [string]$packageName,
         [Parameter(Mandatory=$True)] [string]$packageVersion,
         [Parameter(Mandatory=$True)] [string]$packageDir,

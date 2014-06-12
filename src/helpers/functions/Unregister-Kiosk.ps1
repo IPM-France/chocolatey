@@ -41,7 +41,7 @@ Function Unregister-Kiosk
         # [string]$packageName 
     # ) 
     Param( 
-        [Parameter(Mandatory=$True)] [string]$isHardwarePackage,
+        [Parameter(Mandatory=$True)] [bool]$isHardwarePackage,
         [Parameter(Mandatory=$True)] [string]$packageName,
         [Parameter(Mandatory=$True)] [string]$packageVersion
     ) 
