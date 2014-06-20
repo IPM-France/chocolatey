@@ -1,3 +1,32 @@
+Function Get-Device
+{
+    # Parameters ...
+    Param(
+	   [string]$DeviceType
+    )
+    
+    if ($DeviceType.Trim().Length -eq 0) {
+	   return ''
+    }
+
+	# carte CNAM JNAF93
+<#    $CatalogueDevices = @{
+      Son = 'Realtek High Definition Audio';
+      NetworkLan = 'Intel(R) 82579LM Gigabit Network Connection';
+      NetworkWifi = 'Intel(R) Centrino(R) Advanced-N 6205';
+      Ecran = 'Generic PnP Monitor'
+    }
+#>
+	# carte NC9F6-H61
+    $CatalogueDevices = @{
+      Son = 'Realtek High Definition Audio';
+      NetworkLan = 'Realtek PCIe GBE Family Controller';
+      NetworkWifi = 'Intel(R) Centrino(R) Advanced-N 6205';
+      Ecran = 'Generic PnP Monitor'
+    }
+                        
+    $CatalogueDevices.$DeviceType
+}
 Function Register-Kiosk
 { 
     <# 
