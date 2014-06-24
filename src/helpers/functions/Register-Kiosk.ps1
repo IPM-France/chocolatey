@@ -145,7 +145,7 @@ Function Register-Kiosk
 		# Install NSCA scheduled check ...
 		Write-Host "$($MyInvocation.MyCommand.Name):: installing NSCA scheduled check ..."
 		New-Item -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Force
-		Set-ItemProperty -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Name 'alias' -Value "nsca-$packageName" -Force
+		Set-ItemProperty -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Name 'alias' -Value "nsca_$packageName" -Force
 		Set-ItemProperty -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Name 'command' -Value "check_$packageName" -Force
 		$value=%{'{0}s' -f $packageCheckPeriod}
 		Set-ItemProperty -Path (Join-Path $registryPath "settings/scheduler/schedules/check_$packageName") -Name 'interval' -Value $value -Force
