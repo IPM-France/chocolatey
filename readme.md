@@ -31,7 +31,7 @@ Pour installer, il faut utiliser ces fichiers dans le repository des packages in
 
 En ligne de commande (droits administrateur) :
   
-- net use z: \\ipm-dev-srv\packages mnt_acc-Win7 /user:maintenance /p:no
+- net use z: \\\ipm-dev-srv\packages mnt_acc-Win7 /user:maintenance /p:no
 - z:
 - cd z:\chocolatey
 - installChocolatey.cmd''
