@@ -1,18 +1,18 @@
-Function Unregister-KioskSoftware 
+Function Unregister-Kiosk 
 { 
     <# 
     .Synopsis 
-        Unregister a software installed on the kiosk
+        Unregister a package installed on the kiosk
          
     .Description 
-		Sets values in the registry for the software (installed = 0)
+		Sets values in the registry for the package (installed = 0)
         Removes checkInstalled.cmd and checkOk.cmd files in the NS Client script library
 		Updates nsclient registry configuration to remove checkOk.cmd scheduled execution
          
     .Notes 
         Author    : IPM France, Frédéric MOHIER 
         Date      : 27/7/2013 
-        Version   : 1.2
+        Version   : 1.0
          
         #Requires -Version 2.0 
          
@@ -21,6 +21,9 @@ Function Unregister-KioskSoftware
          
     .Outputs 
         System.Int 
+
+	.Parameter isHardwarePackage
+        Specifies if the package is hardware.
          
     .Parameter packageName
         Specifies the package name.
@@ -38,6 +41,7 @@ Function Unregister-KioskSoftware
         # [string]$packageName 
     # ) 
     Param( 
+        [Parameter(Mandatory=$True)] [bool]$isHardwarePackage,
         [Parameter(Mandatory=$True)] [string]$packageName,
         [Parameter(Mandatory=$True)] [string]$packageVersion
     ) 
@@ -69,9 +73,15 @@ Function Unregister-KioskSoftware
 		Write-Host "$($MyInvocation.MyCommand.Name):: uninstalling check command ..."
 		# Remove-Item -Path (Join-Path $registryPath "settings/external scripts/scripts") -Value "check_$packageName" -ErrorAction SilentlyContinue
 		Remove-ItemProperty -Path (Join-Path $registryPath "settings/external scripts/scripts") -Name "check_$packageName" -ErrorAction SilentlyContinue
+
+		if ($isHardwarePackage) {
+            $packageType = $global:IPM_KSK_PKG_HARDWARE
+        } else {
+            $packageType = $global:IPM_KSK_PKG_SOFTWARE
+        }
 		
-		# Unregistering software installation
-		$regKiosk = Join-Path $global:IPM_KSK_PKG_SOFTWARE $packageName
+		# Unregistering package installation
+		$regKiosk = Join-Path $packageType $packageName
 		#$dhInstallation = Get-Date -Format $global:ksk_dateFormat
 		#Set-ItemProperty -Path $regKiosk -Name "Uninstallation date" -Value "$dhInstallation"
 		#Set-ItemProperty -Path $regKiosk -Name "Installed" -Value -1 -Type DWord
